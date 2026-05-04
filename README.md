@@ -171,8 +171,8 @@ Ao iniciar, o sistema cria automaticamente:
 
 ```
 br.pucpr.authserver
-├── Bootstrapper.kt          ← atualizado com produtos de exemplo
-├── products/                ← [NOVO] CRUD completo de produtos
+├── Bootstrapper.kt         
+├── products/               
 │   ├── Product.kt
 │   ├── ProductRepository.kt
 │   ├── ProductService.kt
@@ -182,7 +182,7 @@ br.pucpr.authserver
 │   │   └── UpdateProductRequest.kt
 │   └── responses/
 │       └── ProductResponse.kt
-└── orders/                  ← [NOVO] Pedidos + associação com produtos
+└── orders/                
     ├── Order.kt
     ├── OrderItem.kt
     ├── OrderRepository.kt
