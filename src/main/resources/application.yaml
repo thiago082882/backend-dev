@@ -1,23 +1,12 @@
 spring:
   application:
     name: authserver
-  datasource:
-    url: jdbc:h2:mem:db
-    username: sa
-    password: sa
-  jpa:
-    show-sql: true
-  h2:
-    console:
-      enabled: true
+    
   web:
     error:
       whitelabel:
         enabled: false
       include-message: always
-      include-binding-errors: always
-      include-stacktrace: always
-      include-exception: true
 
 server:
   servlet:
@@ -27,7 +16,4 @@ springdoc:
   swagger-ui:
     use-root-path: true
 
-logging:
-  file:
-    path: ./logs
 
