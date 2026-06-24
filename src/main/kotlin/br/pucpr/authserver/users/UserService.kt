@@ -11,19 +11,23 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
     val repository: UserRepository,
     val roleRepository: RoleRepository,
+     val avatarService: AvatarService,
     val jwt: Jwt
 ) {
-    fun insert(user: User): User {
-        if (repository.findByEmail(user.email) != null) {
-            throw BadRequestException("User already exists")
-        }
-        return repository.save(user)
+fun insert(user: User): User {
+    if (repository.findByEmail(user.email) != null) {
+        throw BadRequestException("User already exists")
     }
+    val saved = repository.save(user)
+    saved.avatar = avatarService.resolveAndSave(saved)
+    return repository.save(saved)
+}
 
     fun findAll(dir: SortDir = SortDir.ASC) = when (dir) {
         SortDir.ASC -> repository.findAll(Sort.by("name").ascending())
@@ -66,7 +70,12 @@ class UserService(
         repository.save(user)
         return user
     }
-
+fun resetAvatar(id: Long): String {
+    val user = findById(id)
+    user.avatar = avatarService.resolveAndSave(user)
+    repository.save(user)
+    return avatarService.urlFor(user.avatar)
+}
     fun login(email: String, password: String): LoginResponse {
         val user = repository.findByEmail(email) ?: throw UnauthorizedException("User $email not found")
 
@@ -79,7 +88,13 @@ class UserService(
             UserResponse(user)
         )
     }
-
+   fun saveAvatar(id: Long, avatar: MultipartFile): String {
+        val user = findById(id)
+        user.avatar = avatarService.save(user, avatar)
+        repository.save(user)
+        return avatarService.urlFor(user.avatar)
+    }
+    
     companion object {
         val log = LoggerFactory.getLogger(UserService::class.java)
     }

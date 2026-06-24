@@ -13,7 +13,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 
-@Component("fileStorage")
+@Component()
 class S3Storage : FileStorage {
 
     private val s3: AmazonS3 = AmazonS3ClientBuilder.standard()
@@ -57,6 +57,22 @@ class S3Storage : FileStorage {
         return "$PREFIX$key"
     }
 
+override fun saveBytes(user: User, path: String, bytes: ByteArray, contentType: String) {
+    val key = normalizeKey(path)
+
+    val meta = ObjectMetadata().apply {
+        this.contentType = contentType
+        contentLength = bytes.size.toLong()
+        userMetadata["userId"] = user.id.toString()
+    }
+
+    val transferManager = TransferManagerBuilder.standard()
+        .withS3Client(s3)
+        .build()
+
+    transferManager.upload(PUBLIC, key, bytes.inputStream(), meta)
+        .waitForUploadResult()
+}
     private fun normalizeKey(path: String): String =
         path.replace("--", "/")
             .removePrefix("/")

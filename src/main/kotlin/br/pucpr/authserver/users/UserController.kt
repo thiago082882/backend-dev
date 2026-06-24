@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.net.URI
+
 
 @RestController
 @RequestMapping("/users")
@@ -84,4 +87,17 @@ class UserController(val service: UserService) {
             if (it) ResponseEntity.ok().build()
             else ResponseEntity.noContent().build()
         }
+    @PreAuthorize("permitAll()")
+    @SecurityRequirement(name = "jwt-auth")
+    @PutMapping("/{id}/avatar", consumes = ["multipart/form-data"])
+    fun uploadAvatar(@PathVariable id: Long, @RequestParam avatar: MultipartFile) =
+        service.saveAvatar(id, avatar)
+            .let { ResponseEntity.created(URI(it)).build<Void>() }
+
+@PreAuthorize("permitAll()")
+@SecurityRequirement(name = "jwt-auth")
+@DeleteMapping("/{id}/avatar")
+fun resetAvatar(@PathVariable id: Long): ResponseEntity<Void> =
+    service.resetAvatar(id)
+        .let { ResponseEntity.ok().build() }
 }

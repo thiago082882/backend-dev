@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile
 
 interface FileStorage {
     fun save(user: User, path: String, file: MultipartFile)
+    fun saveBytes(user: User, path: String, bytes: ByteArray, contentType: String)
     fun load(path: String): Resource?
     fun urlFor(name: String): String
 }
